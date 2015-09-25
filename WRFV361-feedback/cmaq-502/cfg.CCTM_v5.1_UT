@@ -1,0 +1,115 @@
+
+model       CCTM_v5.1_UT;
+
+FPP         ifort;
+
+cpp_flags   " -Dparallel -DSUBST_BARRIER=SE_BARRIER -DSUBST_GLOBAL_MAX=SE_GLOBAL_MAX -DSUBST_GLOBAL_MIN=SE_GLOBAL_MIN -DSUBST_GLOBAL_MIN_DATA=SE_GLOBAL_MIN_DATA -DSUBST_GLOBAL_TO_LOCAL_COORD=SE_GLOBAL_TO_LOCAL_COORD -DSUBST_GLOBAL_SUM=SE_GLOBAL_SUM -DSUBST_GLOBAL_LOGICAL=SE_GLOBAL_LOGICAL -DSUBST_LOOP_INDEX=SE_LOOP_INDEX -DSUBST_SUBGRID_INDEX=SE_SUBGRID_INDEX -DSUBST_HI_LO_BND_PE=SE_HI_LO_BND_PE -DSUBST_SUM_CHK=SE_SUM_CHK -DSUBST_INIT_ARRAY=SE_INIT_ARRAY -DSUBST_COMM=SE_COMM -DSUBST_MY_REGION=SE_MY_REGION -DSUBST_SLICE=SE_SLICE -DSUBST_GATHER=SE_GATHER -DSUBST_DATA_COPY=SE_DATA_COPY -DSUBST_IN_SYN=SE_IN_SYN";
+
+f_compiler  ifort;
+
+f_flags     "-fixed -132 -O3 -override-limits -fno-alias -mp1 -fp-model precise -I /home/wdx/lib_sol/x86_64/intel/ioapi_3.1/Linux2_x86_64ifort -I /home/wdx/lib_sol/x86_64/intel/mpich/include -I /home/wdx/lib_sol/x86_64/intel/ioapi_3.1/ioapi/fixed_src -I.";
+
+f90_flags   "-free -O3 -fno-alias -mp1 -fp-model precise -I /home/wdx/lib_sol/x86_64/intel/ioapi_3.1/Linux2_x86_64ifort -I /home/wdx/lib_sol/x86_64/intel/mpich/include -I /home/wdx/lib_sol/x86_64/intel/ioapi_3.1/ioapi/fixed_src -I.";
+
+c_compiler  cc;
+
+c_flags     "-O2 -DFLDMN -I /home/wdx/lib_sol/x86_64/intel/mpich/include";
+
+link_flags  "-i-static";
+
+libraries   "-L/home/wdx/lib_sol/x86_64/intel/ioapi_3.1/Linux2_x86_64ifort -lioapi -L/home/wdx/lib_sol/x86_64/intel/netcdf/lib -lnetcdf -lnetcdff -L/home/wdx/lib_sol/x86_64/intel/mpich/lib -lmpich -lmpiif";
+
+// mechanism: cb05tucl_ae6_aq
+// model repository: /home/wdx/CCTM
+
+include SUBST_PE_COMM    ./PE_COMM.EXT;
+include SUBST_CONST      ./CONST.EXT;
+include SUBST_FILES_ID   ./FILES_CTM.EXT;
+include SUBST_EMISPRM    ./EMISPRM.EXT;
+
+// Process Analysis / Integrated Reaction Rates processing
+include SUBST_PACTL_ID    ./PA_CTL.EXT;
+include SUBST_PACMN_ID    ./PA_CMN.EXT;
+include SUBST_PADAT_ID    ./PA_DAT.EXT;
+
+// Parallel / Include message passing definitions
+include SUBST_MPI mpif.h ;
+
+// options are stenex or se_noop
+Module STENEX/se;
+// parallel executable; stenex and pario included
+Module PARIO;
+
+// options are par, par_nodistr and par_noop
+Module par/mpi;
+
+Module ICL/fixed/const;
+Module ICL/fixed/emctrl;
+Module ICL/fixed/filenames;
+Module ICL/fixed/mpi;
+Module ICL/procan/pa_noop;
+
+// option set for WRF-CMAQ twoway
+Module twoway;
+
+// options are ctm_wrf and ctm_yamo
+Module driver/wrf;
+
+// options are cartesian
+Module grid/cartesian;
+
+// options are init_yamo
+Module init/yamo;
+
+// options are gencoor_wrf and gencoor
+Module couple/gencoor_wrf;
+
+// options are hyamo
+Module hadv/yamo;
+
+// options are vwrf and vyamo
+Module vadv/wrf;
+
+// options are multiscale
+Module hdiff/multiscale;
+
+// options are acm2 and acm2_mp
+Module vdiff/acm2;
+
+// options are m3dry and m3dry_mp
+Module depv/m3dry;
+
+// options are emis
+Module emis/emis;
+
+// options are beis3
+Module biog/beis3;
+
+// options are smoke
+Module plrise/smoke;
+
+// options are cgrid_spcs_nml and cgrid_spcs_icl
+Module spcs/cgrid_spcs_nml;
+
+// options are phot_inline and phot_table
+Module phot/phot_inline;
+
+// options are smvgear, ros3, ebi_cb05cl, ebi_cb05tucl, ebi_cb05tump, ebi_saprc99, ebi_saprc07tb, and ebi_saprc07tc
+Module gas/ebi_cb05tucl;
+
+//  gas chemistry reactions modules
+Module MECHS/cb05tucl_ae6_aq;
+
+// options are aero5, aero6, and aero6_mp
+Module aero/aero6;
+
+// options are cloud_acm_ae5, cloud_acm_ae6, and cloud_acm_ae6_mp
+Module cloud/cloud_acm_ae6;
+
+// options are pa, which requires the replacement of the three
+// global include files with their pa_noop counterparts
+Module procan/pa;
+
+// options are util
+Module util/util;
+
